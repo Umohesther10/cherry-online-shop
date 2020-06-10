@@ -1,6 +1,6 @@
 <template>
   <div class="product">
-    <b-container fluid>
+    <b-container>
       <b-row class="mt-5">
         <b-col cols="9">
           <b-card>
@@ -13,9 +13,9 @@
                     alt="Responsive image"
                     style="width:200px; height: 200px; border: 1px; solid; grey;"
                   ></b-img>
-                  <span v-for="img in image" :key="img.image" style="padding:10px;">
+                  <!-- <span v-for="img in image" :key="img.image" style="padding:10px;">
                     <b-img :src="img" fluid alt="Responsive image" id="small" @click="change(img)"></b-img>
-                  </span>
+                  </span> -->
                   <hr />
                   <h6>SHARE THIS PRODUCT</h6>
                   <div class="arrow">
@@ -59,11 +59,11 @@
                 </a>
                 <hr />
                 <h4>
-                  <strong>&#8358; {{ product.discount }}</strong>
+                  <strong>&#8358; {{ product.price }}</strong>
                 </h4>
                 <span>
                   <h6 style="text-decoration: line-through; color: #75757A;">
-                    &#8358; {{ product.price }}
+                    &#8358; {{ product.price  }}
                     <button
                       class="pass"
                       style="padding: 5px"
@@ -134,8 +134,9 @@
                     <br />
                     <h6>{{ product.name }} added to cart</h6>
                     <div>
-                      <!-- <button class="add1" @click="hideModal">CONTINUE SHOPPING</button> -->
-                      <button class="add1" @click="remove(product.id)">REMOVE FROM CART</button>
+                      <button class="add1" @click="hideModal">CONTINUE SHOPPING</button>
+                      <!-- <button class="add1" @click="remove(product.id)">REMOVE FROM CART</button> -->
+
                       <button class="add" @click="openCart">VIEW CART AND CHECKOUT</button>
                     </div>
                   </b-modal>
@@ -216,7 +217,7 @@ export default {
   name: "ProductContent",
   data() {
     return {
-      picture: this.$store.state.selectedProduct.imageLink
+      picture: this.$store.state.selectedProduct.image
     };
   },
   computed: {
@@ -226,11 +227,51 @@ export default {
     },
     image() {
       return this.$store.state.selectedProduct.image;
+    },
+    cartItem() {
+      return this.$store.state.cart;
     }
   },
   methods: {
-    addToCart(product) {
-      this.$store.commit("setCart", product);
+    addToCart(x) {
+      let itemExist = false;
+      let quantity = null;
+      //check if item exist
+      this.$store.state.cart.forEach(item => {
+        if (item.id === x.product_id) {
+          itemExist = true;
+          quantity = item.quantity + 1;
+        }
+      });
+      if (itemExist) {
+        // remove item if it exist
+        let item1 = this.cartItem.filter(item => {
+          return item.id != x.product_id;
+        });
+        this.$store.commit("setRemoveItemCart", item1);
+        // set removed item with its new quantity
+        let item = {
+          id: x.product_id,
+          img: x.image,
+          name: x.name,
+          quantity: quantity,
+          unitPrice: x.price,
+          subTotal: parseInt(x.price) * quantity
+        };
+        this.$store.commit("setCart", item);
+        this.setCart();
+      } else {
+        let item = {
+          id: x.product_id,
+          img: x.image,
+          name: x.name,
+          quantity: 1,
+          unitPrice: x.price,
+          subTotal: x.price
+        };
+        this.$store.commit("setCart", item);
+        this.setCart();
+      }
     },
     hideModal() {
       this.$refs["my-modal"].hide();
@@ -239,8 +280,8 @@ export default {
     change(img) {
       this.picture = img;
     },
-    remove(id) {
-      this.$store.dispatch("removeFromCart", id);
+    openCart() {
+      this.$router.push("/cart");
     }
   }
 };

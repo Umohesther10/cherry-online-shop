@@ -1,6 +1,5 @@
 <template>
   <div class="home">
-    
     <Header />
     <b-container>
       <b-row>
@@ -96,7 +95,7 @@
           <b-card bg-variant="default" text-variant="black" header="Top Selling Items" align="left">
             <b-card-text>
               <b-row>
-                <b-col v-for="product in items" :key="product.product_id">
+                <b-col v-for="product in allProduct" :key="product.product_id">
                   <Product :product="product" />
                 </b-col>
               </b-row>
@@ -167,11 +166,40 @@
           >
             <b-card-text>
               <b-row>
-                <b-col v-for="item in allProduct3" :key="item.id">
+                <!-- <b-col v-for="item in allProduct" :key="item.id">
                   <Product :product="item" />
-                </b-col>
+                </b-col> -->
               </b-row>
             </b-card-text>
+          </b-card>
+        </b-col>
+      </b-row>
+
+      <b-row class="mt-3">
+        <b-col cols="12">
+          <b-card>
+            <b-row>
+              <b-col cols="6">
+                <div class="ar _16-7" id="ar">
+                  <img
+                    data-src="https://ng.jumia.is/cms/Homepage/2020/W19/grocery-desktop.jpg"
+                    src="https://ng.jumia.is/cms/Homepage/2020/W19/grocery-desktop.jpg"
+                    class="-rad4"
+                    alt="NG_W19_DB2.1_Groceries"
+                  />
+                </div>
+              </b-col>
+              <b-col cols="6" fluid>
+                <div class="ar _16-7" id="ar">
+                  <img
+                    data-src="https://ng.jumia.is/cms/Homepage/2020/W20/Artboard-1-copy-2-(1).jpg"
+                    src="https://ng.jumia.is/cms/Homepage/2020/W20/Artboard-1-copy-2-(1).jpg"
+                    class="-rad4"
+                    alt="NG_W20_DB1.1_StayFit"
+                  />
+                </div>
+              </b-col>
+            </b-row>
           </b-card>
         </b-col>
       </b-row>
@@ -202,34 +230,36 @@ export default {
     Footer,
     Top
   },
-  created() {
+  created () {
     axios.get("http://localhost:5000/products").then(response => {
-      this.items = response.data;
-      console.log(response.data);
+      this.$store.commit("setProduct", response.data);
     });
   },
   computed: {
-    allProduct() {
-      let x = this.$store.state.products.filter(item => item.id <= 4);
-      return x;
+    allProduct () {
+      let x = this.$store.state.products.filter(item =>
+        item.product_id <= 4
+        );
+        return x
     },
     allProduct2() {
       let x = this.$store.state.products.filter(item =>
-        [5, 6, 7, 8].includes(item.id)
+        [5, 6, 7, 8].includes(item.product_id)
       );
       return x;
     },
-    allProduct3() {
-      let x = this.$store.state.products.filter(item =>
-        [9, 10, 11, 12].includes(item.id)
-      );
-      return x;
-    }
+    // allProduct3() {
+    //   let x = this.$store.state.products.filter(item =>
+    //     [9, 10, 11, 12].includes(item.id)
+    //   );
+    //   return x;
+    // }
   },
   methods: {}
 };
 </script>
-<style>
+
+<style scoped>
 .center {
   width: 100%;
   background-color: white;
